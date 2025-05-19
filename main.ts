@@ -1,6 +1,11 @@
 import { Hono } from "hono";
 
-const splice = (str, start, delCount, newSubStr) => {
+const splice = (
+  str: string,
+  start: number,
+  delCount: number,
+  newSubStr: string,
+) => {
   return str.slice(0, start) + newSubStr +
     str.slice(start + Math.abs(delCount));
 };
@@ -16,7 +21,7 @@ app.get("/d/:indices/*", (c) => {
   let path = c.req.path;
   path = path.substring("/d/".length);
   path = path.substring(path.indexOf("/") + 1);
-  let atIndices: string[] = [];
+  let atIndices: number[] = [];
   if (indices != "-1" && indices != "") {
     for (const index of indices.split(",")) {
       const numIndex = parseInt(index.trim());
@@ -40,12 +45,12 @@ app.get("/d/:indices/*", (c) => {
 });
 
 app.get("/:indices/*", (c) => {
-  let host = Deno.env.get("DEFAULT_REDIRECTION_HOST") ?? "";
+  const host = Deno.env.get("DEFAULT_REDIRECTION_HOST") ?? "";
   const indices = c.req.param("indices").trim();
   let path = c.req.path;
-  path = path.substring('/'.length);
+  path = path.substring("/".length);
   path = path.substring(path.indexOf("/") + 1);
-  let atIndices: string[] = [];
+  let atIndices: number[] = [];
   if (indices != "-1" && indices != "") {
     for (const index of indices.split(",")) {
       const numIndex = parseInt(index.trim());
