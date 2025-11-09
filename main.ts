@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { serveStatic } from "hono/deno";
 
 const splice = (
   str: string,
@@ -12,8 +13,10 @@ const splice = (
 
 const app = new Hono();
 
-app.get("/", (c) => {
-  return c.text("TODO: Show setup website");
+app.get("/*", serveStatic({ root: "./public/" }));
+
+app.get("/getDefaultRedirectionHost", (c) => {
+  return c.text(Deno.env.get("DEFAULT_REDIRECTION_HOST") ?? "");
 });
 
 app.get("/d/:indices/*", (c) => {
