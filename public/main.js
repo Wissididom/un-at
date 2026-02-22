@@ -19,7 +19,7 @@ function linkChanged() {
   if (!original.includes("@")) {
     // Don't do anything because the link does not include an @ so this tool shouldn't be used...
   }
-  if (!isValidUrl(original)) return;
+  if (!isSafeHttpUrl(original)) return;
   const generated = document.getElementById("generated");
   while (generated.firstChild) {
     generated.removeChild(generated.lastChild);
@@ -32,6 +32,16 @@ function linkChanged() {
     a.innerText = link;
     li.appendChild(a);
     generated.appendChild(li);
+  }
+}
+
+function isSafeHttpUrl(url) {
+  try {
+    const parsed = new URL(url);
+    const protocol = parsed.protocol.toLowerCase();
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
   }
 }
 
