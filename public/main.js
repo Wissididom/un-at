@@ -26,10 +26,12 @@ function linkChanged() {
   }
   const links = generateLinks(original);
   for (const link of links) {
+    if (!isSafeHttpUrl(link)) continue;
+    const normalizedLink = new URL(link).href;
     const li = document.createElement("li");
     const a = document.createElement("a");
-    a.setAttribute("href", link);
-    a.innerText = link;
+    a.setAttribute("href", normalizedLink);
+    a.innerText = normalizedLink;
     li.appendChild(a);
     generated.appendChild(li);
   }
