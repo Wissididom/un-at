@@ -1,6 +1,7 @@
 name: Deno Build
+
 permissions:
-  "contents": "write"
+  contents: "read"
 
 on:
   push:
@@ -17,9 +18,11 @@ jobs:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup Deno
-        uses: denoland/setup-deno@v2
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
           deno-version: v2.x
       - name: Install dependencies
@@ -30,27 +33,31 @@ jobs:
           deno compile -ERN main.ts
       - name: Upload artifact (Windows)
         if: startsWith(matrix.os, 'windows')
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: un-at-${{ matrix.os }}
           path: un-at.exe
       - name: Upload artifact (Ubuntu and Mac)
         if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: un-at-${{ matrix.os }}
           path: un-at
   create-release:
     needs: [build]
+    permissions:
+      contents: "write"
     runs-on: ubuntu-latest
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main')
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         name: Checkout Code
+        with:
+          fetch-depth: 0 # allows for tags access
+          persist-credentials: true # Required to update the nightly-build tag.
 
-      # Windows
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         name: Download Windows
         with:
           name: un-at-windows-latest
@@ -59,7 +66,7 @@ jobs:
       - name: Rename Windows Binary
         run: mv release-artifacts/un-at.exe release-artifacts/un-at-Windows.exe
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         name: Download Linux
         with:
           name: un-at-ubuntu-latest
@@ -68,7 +75,7 @@ jobs:
       - name: Rename Linux Binary
         run: mv release-artifacts/un-at release-artifacts/un-at-Linux
 
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         name: Download Mac
         with:
           name: un-at-macos-latest
@@ -78,7 +85,7 @@ jobs:
         run: mv release-artifacts/un-at release-artifacts/un-at-Mac
 
       - name: Create release
-        uses: ncipollo/release-action@v1.21.0
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
           replacesArtifacts: true
           allowUpdates: true
